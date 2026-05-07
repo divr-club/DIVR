@@ -11,9 +11,24 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
 
   async function handleSignup() {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
+    const { data, error } = await supabase.auth.signUp({
+  email,
+  password,
+});
+
+if (error) {
+  alert(error.message);
+} else {
+  await supabase.from("profiles").insert([
+    {
+      id: data.user.id,
+      username: email.split("@")[0],
+    },
+  ]);
+
+  alert("Account created 🎉");
+  router.push("/login");
+}
     });
 
     if (error) {
