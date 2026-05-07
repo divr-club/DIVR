@@ -1,26 +1,67 @@
-@import "tailwindcss";
+"use client";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabase";
+import Navbar from "../components/Navbar";
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+export default function HomePage() {
+  const router = useRouter();
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkUser() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        router.push("/login");
+      } else {
+        setLoading(false);
+      }
+    }
+
+    checkUser();
+  }, []);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        Loading...
+      </div>
+    );
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  return (
+    <div className="page-container">
+      <Navbar />
+
+      <h1 className="page-title">
+        Welcome back 🌊
+      </h1>
+
+      <p className="page-subtitle">
+        Your upcoming dives and discoveries will appear here.
+      </p>
+
+      <div className="card">
+        <h2 style={{ marginBottom: "12px" }}>
+          Upcoming Dives
+        </h2>
+
+        <p style={{ opacity: 0.7 }}>
+          No dives yet.
+        </p>
+      </div>
+    </div>
+  );
 }
