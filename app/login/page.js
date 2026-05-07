@@ -5,47 +5,98 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
 export default function LoginPage() {
+
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   async function handleLogin() {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     if (error) {
       alert(error.message);
-    } else {
-      router.push("/home");
+      return;
     }
+
+    router.push("/home");
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>DIVR Login</h1>
+    <div className="auth-container">
 
-      <input
-        type="email"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <div className="auth-card">
 
-      <br /><br />
+        <div className="logo">
+          DIVR
+        </div>
 
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <p className="tagline">
+          Continue your underwater journey.
+        </p>
 
-      <br /><br />
+        <form
+          className="form-group"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
+          }}
+        >
 
-      <button onClick={handleLogin}>
-        Login
-      </button>
+          <input
+            className="input"
+            placeholder="Email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+          />
+
+          <input
+            className="input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+          />
+
+          <button
+            className="button"
+            type="submit"
+          >
+            Sign In
+          </button>
+
+        </form>
+
+        <p
+          style={{
+            marginTop: "20px",
+            color: "rgba(255,255,255,0.6)"
+          }}
+        >
+          New to DIVR?
+          {" "}
+          <span
+            style={{
+              color: "#22d3ee",
+              cursor: "pointer"
+            }}
+            onClick={() => router.push("/signup")}
+          >
+            Create account
+          </span>
+        </p>
+
+      </div>
+
     </div>
   );
 }
