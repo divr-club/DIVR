@@ -1,3 +1,5 @@
+import Navbar from "../components/Navbar";
+
 export default function HomePage() {
   return (
     <div style={{
@@ -7,6 +9,7 @@ export default function HomePage() {
       padding: "24px",
       fontFamily: "Arial"
     }}>
+  <Navbar />
       <h1>Welcome to DIVR 🌊</h1>
 
       <p>Your dives will appear here.</p>
