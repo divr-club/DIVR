@@ -12,50 +12,63 @@ export default function SignupPage() {
 
   async function handleSignup() {
     const { data, error } = await supabase.auth.signUp({
-  email,
-  password,
-});
-
-if (error) {
-  alert(error.message);
-} else {
- const profileResult = await supabase
-  .from("profiles")
-  .insert([
-    {
-      id: data.user.id,
-      username: email.split("@")[0],
-    },
-  ]);
-
-console.log(profileResult);
-
-if (profileResult.error) {
-  alert(profileResult.error.message);
-  return;
-}
-
-  alert("Account created 🎉");
-  router.push("/login");
-}
+      email,
+      password,
     });
+
+    console.log(data);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    if (!data?.user) {
+      alert("No user returned from signup");
+      return;
+    }
+
+    const profileResult = await supabase
+      .from("profiles")
+      .insert([
+        {
+          id: data.user.id,
+          username: email.split("@")[0],
+        },
+      ]);
+
+    console.log(profileResult);
+
+    if (profileResult.error) {
+      alert(profileResult.error.message);
+      return;
+    }
+
+    alert("Account created 🎉");
+    router.push("/login");
+  }
+
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#07111f",
-      color: "white",
-      padding: "24px",
-      fontFamily: "Arial"
-    }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#07111f",
+        color: "white",
+        padding: "24px",
+        fontFamily: "Arial",
+      }}
+    >
       <h1>Create DIVR Account 🌊</h1>
 
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
-        maxWidth: "300px",
-        marginTop: "24px"
-      }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+          maxWidth: "300px",
+          marginTop: "24px",
+        }}
+      >
         <input
           placeholder="Email"
           value={email}
@@ -78,7 +91,7 @@ if (profileResult.error) {
             background: "#0ea5a4",
             color: "white",
             border: "none",
-            borderRadius: "8px"
+            borderRadius: "8px",
           }}
         >
           Sign Up
