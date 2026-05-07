@@ -19,26 +19,26 @@ export default function SignupPage() {
 if (error) {
   alert(error.message);
 } else {
-  await supabase.from("profiles").insert([
+ const profileResult = await supabase
+  .from("profiles")
+  .insert([
     {
       id: data.user.id,
       username: email.split("@")[0],
     },
   ]);
 
+console.log(profileResult);
+
+if (profileResult.error) {
+  alert(profileResult.error.message);
+  return;
+}
+
   alert("Account created 🎉");
   router.push("/login");
 }
     });
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Account created 🎉");
-      router.push("/login");
-    }
-  }
-
   return (
     <div style={{
       minHeight: "100vh",
