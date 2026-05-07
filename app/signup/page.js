@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
 export default function SignupPage() {
+
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -23,23 +24,20 @@ export default function SignupPage() {
       return;
     }
 
-    const profileResult = await supabase
-      .from("profiles")
-      .insert([
-        {
-          id: data.user.id,
-          username: email.split("@")[0],
-        },
-      ]);
-
-    console.log(profileResult);
+    const profileResult =
+      await supabase
+        .from("profiles")
+        .insert([
+          {
+            id: data.user.id,
+            username: email.split("@")[0],
+          },
+        ]);
 
     if (profileResult.error) {
       alert(profileResult.error.message);
       return;
     }
-
-    alert("Account created 🌊");
 
     router.push("/home");
   }
@@ -57,7 +55,13 @@ export default function SignupPage() {
           Explore. Dive. Connect.
         </p>
 
-        <div className="form-group">
+        <form
+          className="form-group"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSignup();
+          }}
+        >
 
           <input
             className="input"
@@ -80,12 +84,31 @@ export default function SignupPage() {
 
           <button
             className="button"
-            onClick={handleSignup}
+            type="submit"
           >
-            Sign Up
+            Start Diving
           </button>
 
-        </div>
+        </form>
+
+        <p
+          style={{
+            marginTop: "20px",
+            color: "rgba(255,255,255,0.6)"
+          }}
+        >
+          Already have an account?
+          {" "}
+          <span
+            style={{
+              color: "#22d3ee",
+              cursor: "pointer"
+            }}
+            onClick={() => router.push("/login")}
+          >
+            Login
+          </span>
+        </p>
 
       </div>
 
