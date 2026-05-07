@@ -41,7 +41,7 @@ export default function SignupPage() {
 
     alert("Account created 🌊");
 
-    router.push("/login");
+    router.push("/home");
   }
 
   return (
