@@ -7,24 +7,116 @@
 }
 
 html,
+html,
 body {
+
   font-family: 'Inter', sans-serif;
 
-  background:
-    linear-gradient(
-      rgba(1, 10, 25, 0.82),
-      rgba(1, 10, 25, 0.92)
-    ),
-    url("https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=1600");
+  min-height: 100vh;
 
-  background-size: cover;
-  background-position: center;
+  overflow-x: hidden;
+
+  background-color: #020817;
+
+  background-image:
+
+    /* Guilloche waves */
+    repeating-radial-gradient(
+      circle at 20% 30%,
+      rgba(255,255,255,0.028) 0px,
+      rgba(255,255,255,0.028) 1px,
+      transparent 1px,
+      transparent 26px
+    ),
+
+    repeating-radial-gradient(
+      circle at 80% 70%,
+      rgba(255,255,255,0.02) 0px,
+      rgba(255,255,255,0.02) 1px,
+      transparent 1px,
+      transparent 22px
+    ),
+
+    linear-gradient(
+      180deg,
+      #020817 0%,
+      #03111f 50%,
+      #020817 100%
+    );
 
   color: white;
 
-  min-height: 100vh;
+  position: relative;
 }
 
+body::before {
+
+  content: "";
+
+  position: fixed;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  z-index: -1;
+
+  opacity: 0.16;
+
+  background-repeat: no-repeat;
+
+  background-position:
+    left 12% top 28%,
+    right 10% top 18%,
+    right 16% bottom 22%,
+    left 8% bottom 18%,
+    center center;
+
+  background-size:
+    240px,
+    320px,
+    180px,
+    220px,
+    cover;
+
+  background-image:
+
+    /* Diver silhouette */
+    radial-gradient(
+      ellipse at center,
+      rgba(0,0,0,0.45) 0%,
+      rgba(0,0,0,0.0) 68%
+    ),
+
+    /* Whale shark */
+    radial-gradient(
+      ellipse at center,
+      rgba(0,0,0,0.38) 0%,
+      rgba(0,0,0,0.0) 72%
+    ),
+
+    /* Stingray */
+    radial-gradient(
+      ellipse at center,
+      rgba(0,0,0,0.28) 0%,
+      rgba(0,0,0,0.0) 70%
+    ),
+
+    /* Turtle */
+    radial-gradient(
+      ellipse at center,
+      rgba(0,0,0,0.30) 0%,
+      rgba(0,0,0,0.0) 70%
+    ),
+
+    linear-gradient(
+      rgba(0,0,0,0),
+      rgba(0,0,0,0)
+    );
+
+  filter:
+    blur(8px);
+}
 /* AUTH */
 
 .auth-container {
