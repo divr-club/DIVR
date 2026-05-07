@@ -1,77 +1,45 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "../../lib/supabase";
 import Navbar from "../components/Navbar";
 
 export default function HomePage() {
-  const router = useRouter();
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function checkUser() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        router.push("/login");
-      } else {
-        setLoading(false);
-      }
-    }
-
-    checkUser();
-  }, []);
-
-  if (loading) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "#07111f",
-          color: "white",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontFamily: "Arial",
-        }}
-      >
-        Loading...
-      </div>
-    );
-  }
-
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#07111f",
-        color: "white",
-        padding: "24px",
-        fontFamily: "Arial",
-      }}
-    >
+    <div className="page">
+
       <Navbar />
 
-      <h1>Welcome to DIVR 🌊</h1>
+      <div className="dashboard-grid">
 
-      <p>Your dives will appear here.</p>
+        <div className="card">
+          <h2 className="card-title">
+            Upcoming Dives
+          </h2>
 
-      <div
-        style={{
-          marginTop: "24px",
-          padding: "20px",
-          background: "#102033",
-          borderRadius: "16px",
-        }}
-      >
-        <h2>Upcoming Dives</h2>
+          <p className="card-subtext">
+            No dives scheduled yet.
+          </p>
+        </div>
 
-        <p>No dives yet.</p>
+        <div className="card">
+          <h2 className="card-title">
+            Species Logged
+          </h2>
+
+          <p className="card-subtext">
+            Your marine sightings will appear here.
+          </p>
+        </div>
+
+        <div className="card">
+          <h2 className="card-title">
+            Dive Stats
+          </h2>
+
+          <p className="card-subtext">
+            Track your dives, depth, and hours underwater.
+          </p>
+        </div>
+
       </div>
+
     </div>
   );
 }
