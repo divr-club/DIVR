@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import Navbar from "../components/Navbar";
 
 export default function HomePage() {
   const router = useRouter();
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function checkUser() {
@@ -16,11 +18,31 @@ export default function HomePage() {
 
       if (!session) {
         router.push("/login");
+      } else {
+        setLoading(false);
       }
     }
 
     checkUser();
   }, []);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#07111f",
+          color: "white",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontFamily: "Arial",
+        }}
+      >
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div
