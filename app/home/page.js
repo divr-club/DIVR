@@ -1,45 +1,67 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabase";
 import Navbar from "../components/Navbar";
+import DiveCard from "../components/DiveCard";
 
 export default function HomePage() {
-  return (
-    <div className="page">
+  const router = useRouter();
 
+  const [dives, setDives] = useState([]);
+
+  useEffect(() => {
+    checkUser();
+    fetchDives();
+  }, []);
+
+  async function checkUser() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.push("/login");
+    }
+  }
+
+  async function fetchDives() {
+    const { data, error } = await supabase
+      .from("dives")
+      .select("*")
+      .order("date", { ascending: true });
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setDives(data);
+  }
+
+  return (
+    <div className="home-page">
       <Navbar />
 
-      <div className="dashboard-grid">
+      <div className="home-content">
+        <div className="home-header">
+          <h1>Upcoming Dives</h1>
 
-        <div className="card">
-          <h2 className="card-title">
-            Upcoming Dives
-          </h2>
-
-          <p className="card-subtext">
-            No dives scheduled yet.
-          </p>
+          <button
+            className="create-dive-btn"
+            onClick={() => router.push("/create-dive")}
+          >
+            + Create Dive
+          </button>
         </div>
 
-        <div className="card">
-          <h2 className="card-title">
-            Species Logged
-          </h2>
-
-          <p className="card-subtext">
-            Your marine sightings will appear here.
-          </p>
+        <div className="dives-grid">
+          {dives.map((dive) => (
+            <DiveCard key={dive.id} dive={dive} />
+          ))}
         </div>
-
-        <div className="card">
-          <h2 className="card-title">
-            Dive Stats
-          </h2>
-
-          <p className="card-subtext">
-            Track your dives, depth, and hours underwater.
-          </p>
-        </div>
-
       </div>
-
     </div>
   );
 }
