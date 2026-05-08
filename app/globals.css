@@ -39,29 +39,32 @@ body {
   width: 100%;
   max-width: 420px;
 
-  background: #082032;
+  background: rgba(8, 32, 50, 0.94);
 
   border: 1px solid rgba(255,255,255,0.08);
 
   border-radius: 28px;
 
-  padding: 40px 32px;
+  padding: 42px 34px;
+
+  backdrop-filter: blur(10px);
 
   box-shadow:
-    0 0 40px rgba(34,211,238,0.08);
+    0 0 50px rgba(34,211,238,0.08);
 }
 
 /* LOGO */
 
 .logo {
-  font-size: 56px;
-  font-weight: 700;
+  font-size: 64px;
 
-  text-align: center;
+  font-weight: 700;
 
   letter-spacing: 0.18em;
 
-  margin-bottom: 10px;
+  text-align: center;
+
+  margin-bottom: 12px;
 }
 
 .subtitle {
@@ -70,9 +73,11 @@ body {
   color: rgba(255,255,255,0.68);
 
   margin-bottom: 32px;
+
+  font-size: 15px;
 }
 
-/* FORMS */
+/* FORM */
 
 .form-group {
   display: flex;
@@ -86,7 +91,7 @@ body {
 
   padding: 16px 18px;
 
-  border-radius: 16px;
+  border-radius: 18px;
 
   border: 1px solid rgba(255,255,255,0.08);
 
@@ -97,6 +102,8 @@ body {
   font-size: 15px;
 
   outline: none;
+
+  transition: 0.25s ease;
 }
 
 .input::placeholder {
@@ -107,7 +114,7 @@ body {
   border-color: #22d3ee;
 
   box-shadow:
-    0 0 20px rgba(34,211,238,0.12);
+    0 0 20px rgba(34,211,238,0.18);
 }
 
 /* BUTTON */
@@ -119,7 +126,7 @@ body {
 
   border: none;
 
-  border-radius: 16px;
+  border-radius: 18px;
 
   background: linear-gradient(
     135deg,
@@ -129,9 +136,9 @@ body {
 
   color: #02131f;
 
-  font-weight: 700;
-
   font-size: 16px;
+
+  font-weight: 700;
 
   cursor: pointer;
 
@@ -148,11 +155,11 @@ body {
 /* LINKS */
 
 .auth-link {
-  margin-top: 18px;
+  margin-top: 20px;
 
   text-align: center;
 
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.72);
 }
 
 .auth-link a {
@@ -164,8 +171,14 @@ body {
 /* HOME PAGE */
 
 .home-container {
+  max-width: 1400px;
+
+  margin: 0 auto;
+
   padding: 24px;
 }
+
+/* NAVBAR */
 
 .navbar {
   display: flex;
@@ -173,36 +186,99 @@ body {
   justify-content: space-between;
   align-items: center;
 
-  background: #082032;
+  background: rgba(8, 32, 50, 0.92);
 
-  border-radius: 22px;
+  border-radius: 28px;
 
-  padding: 20px 28px;
+  padding: 24px 30px;
 
   margin-bottom: 32px;
 
   border: 1px solid rgba(255,255,255,0.06);
+
+  backdrop-filter: blur(12px);
 }
 
-.nav-title {
-  font-size: 28px;
-  font-weight: 700;
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
 }
 
-.logout-button {
-  padding: 12px 18px;
+.logo-circle {
+  width: 64px;
+  height: 64px;
 
-  border-radius: 14px;
+  border-radius: 50%;
 
-  border: none;
+  background: linear-gradient(
+    135deg,
+    #22d3ee,
+    #14b8a6
+  );
 
-  background: #14b8a6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   color: #02131f;
 
   font-weight: 700;
 
+  font-size: 18px;
+
+  box-shadow:
+    0 0 24px rgba(34,211,238,0.22);
+}
+
+.nav-brand {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-title {
+  font-size: 42px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.12em;
+}
+
+.nav-subtitle {
+  font-size: 13px;
+
+  color: rgba(255,255,255,0.52);
+
+  letter-spacing: 0.18em;
+}
+
+/* LOGOUT BUTTON */
+
+.logout-button {
+  padding: 14px 22px;
+
+  border-radius: 16px;
+
+  border: none;
+
+  background: rgba(20,184,166,0.18);
+
+  color: #22d3ee;
+
+  font-weight: 700;
+
   cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.logout-button:hover {
+  background: #14b8a6;
+
+  color: #02131f;
+
+  box-shadow:
+    0 0 20px rgba(34,211,238,0.18);
 }
 
 /* DASHBOARD */
@@ -211,27 +287,44 @@ body {
   display: grid;
 
   grid-template-columns:
-    repeat(auto-fit, minmax(260px, 1fr));
+    repeat(auto-fit, minmax(320px, 1fr));
 
   gap: 24px;
 }
 
 .dashboard-card {
-  background: #082032;
+  background: rgba(8, 32, 50, 0.92);
 
-  border-radius: 24px;
+  border-radius: 28px;
 
   padding: 28px;
 
-  min-height: 180px;
+  min-height: 220px;
 
   border: 1px solid rgba(255,255,255,0.06);
+
+  backdrop-filter: blur(10px);
+
+  transition: 0.25s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+
+  border-color: rgba(34,211,238,0.22);
+
+  box-shadow:
+    0 0 24px rgba(34,211,238,0.12);
 }
 
 .dashboard-card h2 {
-  margin-bottom: 12px;
+  font-size: 34px;
+
+  margin-bottom: 14px;
 }
 
 .dashboard-card p {
   color: rgba(255,255,255,0.68);
+
+  line-height: 1.6;
 }
