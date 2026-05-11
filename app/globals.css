@@ -430,3 +430,7 @@ a:hover { text-decoration: underline; }
   .auth-card { padding: 28px 18px; }
   .logo { font-size: 36px; }
 }
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.4);
+  cursor: pointer;
+}
