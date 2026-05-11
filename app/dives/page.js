@@ -54,7 +54,11 @@ export default function DivesPage() {
         ) : (
           <div className="dives-grid">
             {dives.map((dive) => (
-              <div key={dive.id} className="dive-card">
+              <div
+  key={dive.id}
+  className="dive-card"
+  onClick={() => router.push(`/dives/${dive.id}`)}
+>
                 <div className="dive-card-location">{dive.location}</div>
                 <div className="dive-card-date">
                   {new Date(dive.date).toLocaleDateString("en-GB", {
