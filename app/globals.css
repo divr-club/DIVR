@@ -363,3 +363,125 @@ body::after {
 .bg-overlay {
   pointer-events: none;
 }
+.dives-content {
+  padding: 42px;
+}
+
+.dives-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.dives-header h1 {
+  font-size: 54px;
+  font-weight: 700;
+  color: white;
+}
+
+.dives-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.dive-card {
+  background: rgba(5, 18, 38, 0.72);
+  border: 1px solid rgba(34, 211, 238, 0.12);
+
+  border-radius: 24px;
+
+  padding: 26px;
+
+  transition: 0.25s ease;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 0 30px rgba(0,0,0,0.22);
+}
+
+.dive-card:hover {
+  transform: translateY(-6px);
+
+  border-color: rgba(34,211,238,0.45);
+
+  box-shadow:
+    0 0 32px rgba(34,211,238,0.16);
+}
+
+.dive-card-location {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.dive-card-date {
+  font-size: 15px;
+  color: rgba(255,255,255,0.58);
+  margin-bottom: 20px;
+}
+
+.dive-card-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dive-card-spots {
+  color: #22d3ee;
+  font-size: 15px;
+}
+
+.dive-badge {
+  background: rgba(34,211,238,0.12);
+
+  border: 1px solid rgba(34,211,238,0.2);
+
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  color: #67e8f9;
+
+  font-size: 13px;
+
+  letter-spacing: 0.08em;
+}
+.create-dive-btn {
+  border: none;
+
+  background: linear-gradient(
+    135deg,
+    #22d3ee,
+    #06b6d4
+  );
+
+  color: #02131f;
+
+  font-weight: 700;
+
+  padding: 14px 22px;
+
+  border-radius: 14px;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+
+  font-size: 14px;
+
+  box-shadow:
+    0 0 24px rgba(34,211,238,0.2);
+}
+
+.create-dive-btn:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 0 36px rgba(34,211,238,0.38);
+}
