@@ -353,3 +353,13 @@ a {
   box-shadow:
     0 0 40px rgba(34,211,238,0.14);
 }
+body::before,
+body::after {
+  pointer-events: none;
+}
+
+.page-background,
+.background-overlay,
+.bg-overlay {
+  pointer-events: none;
+}
