@@ -485,3 +485,48 @@ body::after {
   box-shadow:
     0 0 36px rgba(34,211,238,0.38);
 }
+.create-dive-wrapper {
+  min-height: calc(100vh - 72px);
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  padding: 40px;
+}
+
+.create-dive-card {
+  width: 100%;
+  max-width: 520px;
+
+  background: rgba(4, 16, 32, 0.74);
+
+  border: 1px solid rgba(34,211,238,0.12);
+
+  border-radius: 28px;
+
+  padding: 42px;
+
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 0 50px rgba(34,211,238,0.08);
+}
+
+.create-dive-card h1 {
+  font-size: 42px;
+
+  color: white;
+
+  margin-bottom: 10px;
+}
+
+.create-subtext {
+  color: rgba(255,255,255,0.45);
+
+  margin-bottom: 28px;
+
+  letter-spacing: 0.05em;
+}
