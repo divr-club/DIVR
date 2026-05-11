@@ -3,15 +3,17 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import Navbar from "../components/Navbar";
 
 export default function CreateDivePage() {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
-  const [diveType, setDiveType] = useState("");
   const [date, setDate] = useState("");
   const [spots, setSpots] = useState("");
+  const [depth, setDepth] = useState("");
+  const [type, setType] = useState("");
 
   useEffect(() => {
     checkUser();
@@ -31,40 +33,42 @@ export default function CreateDivePage() {
     e.preventDefault();
 
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
 
     const { error } = await supabase.from("dives").insert([
       {
-        host_id: user.id,
         title,
         location,
-        dive_type: diveType,
         date,
-        spots: Number(spots),
+        spots,
+        depth,
+        type,
+        host_id: session.user.id,
       },
     ]);
 
     if (error) {
       alert(error.message);
-      return;
+    } else {
+      router.push("/dives");
     }
-
-    alert("Dive created 🌊");
-    router.push("/home");
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <h1 className="logo-text">Create Dive</h1>
+    <div className="create-dive-page">
+      <Navbar />
 
-        <p className="subtitle">
-          Plan your next underwater adventure.
-        </p>
+      <div className="create-dive-wrapper">
+        <form className="create-dive-card" onSubmit={handleCreateDive}>
+          <h1>Create Dive</h1>
 
-        <form onSubmit={handleCreateDive} className="auth-form">
+          <p className="create-subtext">
+            Plan your next underwater adventure.
+          </p>
+
           <input
+            className="auth-input"
             type="text"
             placeholder="Dive Title"
             value={title}
@@ -73,6 +77,7 @@ export default function CreateDivePage() {
           />
 
           <input
+            className="auth-input"
             type="text"
             placeholder="Location"
             value={location}
@@ -81,14 +86,7 @@ export default function CreateDivePage() {
           />
 
           <input
-            type="text"
-            placeholder="Dive Type (Reef, Wreck, Open Water)"
-            value={diveType}
-            onChange={(e) => setDiveType(e.target.value)}
-            required
-          />
-
-          <input
+            className="auth-input"
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
@@ -96,6 +94,7 @@ export default function CreateDivePage() {
           />
 
           <input
+            className="auth-input"
             type="number"
             placeholder="Available Spots"
             value={spots}
@@ -103,7 +102,23 @@ export default function CreateDivePage() {
             required
           />
 
-          <button type="submit">
+          <input
+            className="auth-input"
+            type="number"
+            placeholder="Depth (meters)"
+            value={depth}
+            onChange={(e) => setDepth(e.target.value)}
+          />
+
+          <input
+            className="auth-input"
+            type="text"
+            placeholder="Dive Type (Reef, Wreck, Cave...)"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+          />
+
+          <button className="auth-button" type="submit">
             Create Dive
           </button>
         </form>
