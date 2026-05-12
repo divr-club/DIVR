@@ -659,3 +659,66 @@ body::after {
 
   color: rgba(255,255,255,0.75);
 }
+.nav-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-avatar {
+  width: 44px;
+  height: 44px;
+
+  border-radius: 999px;
+
+  background: linear-gradient(
+    135deg,
+    #22d3ee,
+    #06b6d4
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #02131f;
+
+  font-weight: 700;
+  font-size: 18px;
+
+  box-shadow:
+    0 0 20px rgba(34,211,238,0.22);
+}
+
+.profile-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name {
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.logout-link {
+  border: none;
+  background: transparent;
+
+  color: rgba(255,255,255,0.45);
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+  padding: 0;
+
+  text-align: left;
+
+  transition: 0.2s ease;
+}
+
+.logout-link:hover {
+  color: #22d3ee;
+}
