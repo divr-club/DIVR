@@ -57,7 +57,7 @@ export default function DivesPage() {
               <div
   key={dive.id}
   className="dive-card"
-  onClick={() => router.push("/create-dive")}
+  onClick={() => router.push(`/dives/${dive.id}`)}
 >
                 <div className="dive-card-location">{dive.location}</div>
                 <div className="dive-card-date">
