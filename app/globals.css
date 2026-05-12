@@ -599,3 +599,63 @@ body::after {
   box-shadow:
     0 0 40px rgba(34,211,238,0.28);
 }
+.dive-detail-wrapper {
+  padding: 50px;
+
+  display: flex;
+  justify-content: center;
+}
+
+.dive-detail-card {
+  width: 100%;
+  max-width: 760px;
+
+  background: rgba(5, 18, 38, 0.72);
+
+  border: 1px solid rgba(34,211,238,0.12);
+
+  border-radius: 28px;
+
+  padding: 40px;
+
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 0 40px rgba(34,211,238,0.08);
+}
+
+.dive-detail-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 24px;
+}
+
+.dive-detail-card h1 {
+  font-size: 52px;
+
+  margin-bottom: 16px;
+
+  color: white;
+}
+
+.dive-detail-location {
+  font-size: 18px;
+
+  color: rgba(255,255,255,0.7);
+
+  margin-bottom: 12px;
+}
+
+.dive-detail-date {
+  color: #22d3ee;
+
+  margin-bottom: 28px;
+}
+
+.detail-row {
+  margin-bottom: 18px;
+
+  color: rgba(255,255,255,0.75);
+}
