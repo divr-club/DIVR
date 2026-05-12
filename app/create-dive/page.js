@@ -5,9 +5,6 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import Navbar from "../components/Navbar";
 
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
 export default function CreateDivePage() {
   const router = useRouter();
 
@@ -17,7 +14,7 @@ export default function CreateDivePage() {
   const [depth, setDepth] = useState("");
   const [diveType, setDiveType] = useState("");
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState("");
 
   useEffect(() => {
     checkUser();
@@ -68,69 +65,62 @@ export default function CreateDivePage() {
         <form className="create-dive-card" onSubmit={handleCreateDive}>
           <h1>Create Dive</h1>
 
-          <p className="create-dive-subtitle">
+          <p className="create-subtext">
             Plan your next underwater adventure.
           </p>
 
-          <div className="create-dive-grid">
-            <input
-              type="text"
-              placeholder="Dive Title"
-              className="auth-input"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
+          <input
+            className="auth-input"
+            type="text"
+            placeholder="Dive Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
 
-            <input
-              type="text"
-              placeholder="Location"
-              className="auth-input"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              required
-            />
+          <input
+            className="auth-input"
+            type="text"
+            placeholder="Location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+          />
 
-            <input
-              type="number"
-              placeholder="Available Spots"
-              className="auth-input"
-              value={spots}
-              onChange={(e) => setSpots(e.target.value)}
-              required
-            />
+          <input
+            className="auth-input"
+            type="datetime-local"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            required
+          />
 
-            <input
-              type="number"
-              placeholder="Depth (meters)"
-              className="auth-input"
-              value={depth}
-              onChange={(e) => setDepth(e.target.value)}
-            />
+          <input
+            className="auth-input"
+            type="number"
+            placeholder="Available Spots"
+            value={spots}
+            onChange={(e) => setSpots(e.target.value)}
+            required
+          />
 
-            <input
-              type="text"
-              placeholder="Dive Type (Reef, Wreck, Night...)"
-              className="auth-input full-width"
-              value={diveType}
-              onChange={(e) => setDiveType(e.target.value)}
-            />
+          <input
+            className="auth-input"
+            type="number"
+            placeholder="Depth (meters)"
+            value={depth}
+            onChange={(e) => setDepth(e.target.value)}
+          />
 
-            <div className="full-width">
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
-                showTimeSelect
-                timeFormat="HH:mm"
-                timeIntervals={15}
-                dateFormat="MMMM d, yyyy h:mm aa"
-                className="auth-input"
-                placeholderText="Select dive date & time"
-              />
-            </div>
-          </div>
+          <input
+            className="auth-input"
+            type="text"
+            placeholder="Dive Type (Reef, Wreck, Night...)"
+            value={diveType}
+            onChange={(e) => setDiveType(e.target.value)}
+          />
 
-          <button type="submit" className="primary-button">
+          <button type="submit" className="auth-button">
             Create Dive
           </button>
         </form>
