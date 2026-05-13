@@ -16,11 +16,14 @@ export default function DivesPage() {
   }, []);
 
   async function fetchDives() {
+
     const { data, error } = await supabase
       .from("dives")
       .select(`
         *,
-        dive_participants(count)
+        dive_participants (
+          user_id
+        )
       `)
       .order("date", { ascending: true });
 
@@ -30,16 +33,21 @@ export default function DivesPage() {
       return;
     }
 
-    const formattedDives = (data || []).map((dive) => {
-      const joined = dive.dive_participants?.[0]?.count || 0;
+    const formatted = (data || []).map((dive) => {
+
+      const joinedCount =
+        dive.dive_participants?.length || 0;
 
       return {
         ...dive,
-        spots_left: Math.max((dive.spots || 0) - joined, 0),
+        spots_left: Math.max(
+          (dive.spots || 0) - joinedCount,
+          0
+        ),
       };
     });
 
-    setDives(formattedDives);
+    setDives(formatted);
 
     setLoading(false);
   }
@@ -69,6 +77,7 @@ export default function DivesPage() {
           <div className="dives-grid">
 
             {dives.map((dive) => (
+
               <div
                 key={dive.id}
                 className="dive-card"
@@ -94,15 +103,40 @@ export default function DivesPage() {
                 </div>
 
                 <div className="dive-date">
-                  {new Date(dive.date).toLocaleDateString("en-GB", {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
+                  {new Date(dive.date).toLocaleDateString(
+                    "en-GB",
+                    {
+                      weekday: "short",
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    }
+                  )}
                 </div>
 
+                {dive.dive_participants?.length > 0 && (
+
+                  <div className="dive-participants-preview">
+
+                    {dive.dive_participants
+                      .slice(0, 5)
+                      .map((_, index) => (
+
+                        <div
+                          key={index}
+                          className="participant-bubble"
+                        >
+                          Diver
+                        </div>
+
+                    ))}
+
+                  </div>
+
+                )}
+
               </div>
+
             ))}
 
           </div>
