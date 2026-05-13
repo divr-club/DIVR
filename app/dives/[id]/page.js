@@ -1,137 +1,139 @@
 "use client";
- 
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 import Navbar from "../../components/Navbar";
 
-export default function DiveDetailPage() {
+export default function DiveDetailsPage() {
   const params = useParams();
 
   const [dive, setDive] = useState(null);
+  const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetchDive();
+    loadPage();
   }, []);
 
+  async function loadPage() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    setUser(user);
+
+    await fetchDive();
+  }
+
   async function fetchDive() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("dives")
       .select("*")
       .eq("id", params.id)
       .single();
 
-    if (error) {
-      console.log(error);
-      return;
-    }
-
     setDive(data);
+
+    const { data: participantData } = await supabase
+      .from("dive_participants")
+      .select("*")
+      .eq("dive_id", params.id);
+
+    setParticipants(participantData || []);
+
     setLoading(false);
   }
 
   async function joinDive() {
-    if (!dive) return;
-
     setJoining(true);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      alert("Please log in.");
-      setJoining(false);
-      return;
-    }
 
     const { error } = await supabase
       .from("dive_participants")
       .insert({
-        dive_id: dive.id,
+        dive_id: params.id,
         user_id: user.id,
       });
 
-    if (error) {
-      console.log(error);
-
-      alert("Could not join dive.");
-
-      setJoining(false);
-
-      return;
+    if (!error) {
+      await fetchDive();
     }
-
-    alert("Joined dive 🌊");
 
     setJoining(false);
   }
 
-  if (loading) {
+  if (loading || !dive) {
     return (
       <div className="dives-page">
         <Navbar />
-
-        <div className="dives-content">
-          <p>Loading dive...</p>
-        </div>
       </div>
     );
   }
 
-  if (!dive) {
-    return (
-      <div className="dives-page">
-        <Navbar />
+  const spotsLeft = dive.spots - participants.length;
 
-        <div className="dives-content">
-          <p>Dive not found.</p>
-        </div>
-      </div>
-    );
-  }
+  const alreadyJoined = participants.some(
+    (p) => p.user_id === user?.id
+  );
 
   return (
     <div className="dives-page">
       <Navbar />
 
-      <div className="dive-detail-wrapper">
-        <div className="dive-detail-card">
-          <div className="dive-detail-top">
-            <span className="dive-badge">
-              {dive.dive_type || "Dive"}
+      <div className="dive-details-wrapper">
+        <div className="dive-details-card">
+
+          <div className="dive-top-row">
+
+            <span className="dive-type-badge">
+              {dive.type || "Reef"}
             </span>
 
-            <span className="spots-left">
-              {dive.spots} spots
+            <span className="dive-spots">
+              {spotsLeft} spots left
             </span>
+
           </div>
 
           <h1>{dive.title}</h1>
 
-          <p className="dive-detail-location">
+          <div className="dive-location">
             📍 {dive.location}
-          </p>
+          </div>
 
-          <p className="dive-detail-date">
-            {new Date(dive.date).toLocaleString()}
-          </p>
-
-          {dive.depth && (
-            <div className="detail-row">
-              <strong>Depth:</strong> {dive.depth}m
-            </div>
-          )}
+          <div className="dive-date">
+            {new Date(dive.date).toLocaleString("en-GB", {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </div>
 
           <button
-            className="primary-button"
+            className="join-dive-btn"
             onClick={joinDive}
-            disabled={joining}
+            disabled={joining || alreadyJoined}
           >
-            {joining ? "Joining..." : "Join Dive"}
+            {alreadyJoined
+              ? "Joined ✓"
+              : joining
+              ? "Joining..."
+              : "Join Dive"}
           </button>
+
+          <div className="participants-list">
+            {participants.map((p) => (
+              <div key={p.id} className="participant-chip">
+                Diver
+              </div>
+            ))}
+          </div>
+
         </div>
       </div>
     </div>
