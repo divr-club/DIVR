@@ -16,12 +16,30 @@ export default function DivesPage() {
   }, []);
 
   async function fetchDives() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("dives")
-      .select("*")
+      .select(`
+        *,
+        dive_participants(count)
+      `)
       .order("date", { ascending: true });
 
-    setDives(data || []);
+    if (error) {
+      console.error(error);
+      setLoading(false);
+      return;
+    }
+
+    const formattedDives = (data || []).map((dive) => {
+      const joined = dive.dive_participants?.[0]?.count || 0;
+
+      return {
+        ...dive,
+        spots_left: Math.max((dive.spots || 0) - joined, 0),
+      };
+    });
+
+    setDives(formattedDives);
 
     setLoading(false);
   }
@@ -31,7 +49,9 @@ export default function DivesPage() {
       <Navbar />
 
       <div className="dives-content">
+
         <div className="dives-header">
+
           <h1>Upcoming Dives</h1>
 
           <button
@@ -40,35 +60,40 @@ export default function DivesPage() {
           >
             + Create Dive
           </button>
+
         </div>
 
         {loading ? (
           <p>Loading...</p>
         ) : (
           <div className="dives-grid">
+
             {dives.map((dive) => (
               <div
                 key={dive.id}
                 className="dive-card"
                 onClick={() => router.push(`/dives/${dive.id}`)}
               >
+
                 <div className="dive-card-top">
-                  <span className="dive-badge">
+
+                  <span className="dive-type-badge">
                     {dive.type || "Reef"}
                   </span>
 
                   <span className="dive-spots">
-                    {dive.spots} spots
+                    {dive.spots_left} spots left
                   </span>
+
                 </div>
 
                 <h2>{dive.title}</h2>
 
-                <div className="dive-card-location">
+                <div className="dive-location">
                   📍 {dive.location}
                 </div>
 
-                <div className="dive-card-date">
+                <div className="dive-date">
                   {new Date(dive.date).toLocaleDateString("en-GB", {
                     weekday: "short",
                     day: "numeric",
@@ -76,8 +101,10 @@ export default function DivesPage() {
                     year: "numeric",
                   })}
                 </div>
+
               </div>
             ))}
+
           </div>
         )}
       </div>
