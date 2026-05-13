@@ -888,3 +888,39 @@ body::after {
 
   font-size: 14px;
 }
+.dive-card-top {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 24px;
+}
+.dive-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 12px 22px;
+
+  border-radius: 999px;
+
+  background: rgba(34,211,238,0.1);
+
+  border: 1px solid rgba(34,211,238,0.24);
+
+  color: #35d6ff;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+
+  width: fit-content;
+
+  min-width: 88px;
+}
