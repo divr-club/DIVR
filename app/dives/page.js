@@ -1,125 +1,85 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { supabase } from "../../../lib/supabase";
-import Navbar from "../../components/Navbar";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabase";
+import Navbar from "../components/Navbar";
 
-export default function DiveDetailsPage() {
-  const params = useParams();
+export default function DivesPage() {
+  const router = useRouter();
 
-  const [dive, setDive] = useState(null);
-  const [participants, setParticipants] = useState([]);
+  const [dives, setDives] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [joining, setJoining] = useState(false);
 
   useEffect(() => {
-    fetchDive();
+    fetchDives();
   }, []);
 
-  async function fetchDive() {
+  async function fetchDives() {
     const { data } = await supabase
       .from("dives")
       .select("*")
-      .eq("id", params.id)
-      .single();
+      .order("date", { ascending: true });
 
-    setDive(data);
-
-    const { data: participantData } = await supabase
-      .from("dive_participants")
-      .select("*")
-      .eq("dive_id", params.id);
-
-    setParticipants(participantData || []);
+    setDives(data || []);
 
     setLoading(false);
   }
-
-  async function joinDive() {
-    setJoining(true);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    const { error } = await supabase
-      .from("dive_participants")
-      .insert({
-        dive_id: params.id,
-        user_id: user.id,
-      });
-
-    if (!error) {
-      alert("Joined dive 🌊");
-
-      fetchDive();
-    }
-
-    setJoining(false);
-  }
-
-  if (loading || !dive) {
-    return (
-      <div className="dives-page">
-        <Navbar />
-      </div>
-    );
-  }
-
-  const spotsLeft = dive.spots - participants.length;
 
   return (
     <div className="dives-page">
       <Navbar />
 
-      <div className="dive-details-wrapper">
-        <div className="dive-details-card">
-
-          <div className="dive-top-row">
-            <span className="dive-type-badge">
-              {dive.type || "Reef"}
-            </span>
-
-            <span className="dive-spots">
-              {spotsLeft} spots left
-            </span>
-          </div>
-
-          <h1>{dive.title}</h1>
-
-          <div className="dive-location">
-            📍 {dive.location}
-          </div>
-
-          <div className="dive-date">
-            {new Date(dive.date).toLocaleString("en-GB", {
-              weekday: "short",
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </div>
+      <div className="dives-content">
+        <div className="dives-header">
+          <h1>Upcoming Dives</h1>
 
           <button
-            className="join-dive-btn"
-            onClick={joinDive}
-            disabled={joining}
+            className="create-dive-btn"
+            onClick={() => router.push("/create-dive")}
           >
-            {joining ? "Joining..." : "Join Dive"}
+            + Create Dive
           </button>
+        </div>
 
-          <div className="participants-list">
-            {participants.map((p) => (
-              <div key={p.id} className="participant-chip">
-                Diver
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <div className="dives-grid">
+            {dives.map((dive) => (
+              <div
+                key={dive.id}
+                className="dive-card"
+                onClick={() => router.push(`/dives/${dive.id}`)}
+              >
+                <div className="dive-card-top">
+                  <span className="dive-badge">
+                    {dive.type || "Reef"}
+                  </span>
+
+                  <span className="dive-spots">
+                    {dive.spots} spots
+                  </span>
+                </div>
+
+                <h2>{dive.title}</h2>
+
+                <div className="dive-card-location">
+                  📍 {dive.location}
+                </div>
+
+                <div className="dive-card-date">
+                  {new Date(dive.date).toLocaleDateString("en-GB", {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </div>
               </div>
             ))}
           </div>
-
-        </div>
+        )}
       </div>
     </div>
   );
