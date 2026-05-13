@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 import Navbar from "../../components/Navbar";
 
 export default function DiveDetailPage() {
   const params = useParams();
-  const router = useRouter();
 
   const [dive, setDive] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [joining, setJoining] = useState(false);
 
   useEffect(() => {
     fetchDive();
@@ -32,10 +32,48 @@ export default function DiveDetailPage() {
     setLoading(false);
   }
 
+  async function joinDive() {
+    if (!dive) return;
+
+    setJoining(true);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Please log in.");
+      setJoining(false);
+      return;
+    }
+
+    const { error } = await supabase
+      .from("dive_participants")
+      .insert({
+        dive_id: dive.id,
+        user_id: user.id,
+      });
+
+    if (error) {
+      console.log(error);
+
+      alert("Could not join dive.");
+
+      setJoining(false);
+
+      return;
+    }
+
+    alert("Joined dive 🌊");
+
+    setJoining(false);
+  }
+
   if (loading) {
     return (
       <div className="dives-page">
         <Navbar />
+
         <div className="dives-content">
           <p>Loading dive...</p>
         </div>
@@ -47,6 +85,7 @@ export default function DiveDetailPage() {
     return (
       <div className="dives-page">
         <Navbar />
+
         <div className="dives-content">
           <p>Dive not found.</p>
         </div>
@@ -87,11 +126,12 @@ export default function DiveDetailPage() {
           )}
 
           <button
-  className="primary-button"
-  onClick={joinDive}
->
-  Join Dive
-</button>
+            className="primary-button"
+            onClick={joinDive}
+            disabled={joining}
+          >
+            {joining ? "Joining..." : "Join Dive"}
+          </button>
         </div>
       </div>
     </div>
