@@ -86,9 +86,12 @@ export default function DiveDetailPage() {
             </div>
           )}
 
-          <button className="primary-button">
-            Join Dive
-          </button>
+          <button
+  className="primary-button"
+  onClick={joinDive}
+>
+  Join Dive
+</button>
         </div>
       </div>
     </div>
