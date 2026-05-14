@@ -4,64 +4,105 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 import Navbar from "../components/Navbar";
-import DiveCard from "../components/DiveCard";
 
 export default function HomePage() {
   const router = useRouter();
 
-  const [dives, setDives] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [nextDive, setNextDive] = useState(null);
 
   useEffect(() => {
-    checkUser();
-    fetchDives();
+    loadHome();
   }, []);
 
-  async function checkUser() {
+  async function loadHome() {
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
-      router.push("/login");
-    }
-  }
+    if (!user) return;
 
-  async function fetchDives() {
-    const { data, error } = await supabase
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    setProfile(profileData);
+
+    const { data: diveData } = await supabase
       .from("dives")
       .select("*")
-      .order("date", { ascending: true });
+      .order("date", { ascending: true })
+      .limit(1)
+      .single();
 
-    if (error) {
-      console.log(error);
-      return;
-    }
-
-    setDives(data);
+    setNextDive(diveData);
   }
 
   return (
-    <div className="home-page">
+    <div className="dives-page">
+
       <Navbar />
 
-      <div className="home-content">
-        <div className="home-header">
-          <h1>Upcoming Dives</h1>
+      <div className="home-wrapper">
 
-          <button
-            className="create-dive-btn"
-            onClick={() => router.push("/create-dive")}
+        <div className="home-hero">
+
+          <h1>
+            Welcome back, {profile?.username || "Diver"} 🌊
+          </h1>
+
+          <p className="home-subtext">
+            Keep diving. The reef remembers who returns.
+          </p>
+
+        </div>
+
+        <div className="home-stats">
+
+          <div className="profile-stat-card">
+            <h2>{profile?.total_logged_dives || 0}</h2>
+            <span>Total Dives</span>
+          </div>
+
+          <div className="profile-stat-card">
+            <h2>{profile?.species_count || 0}</h2>
+            <span>Species Found</span>
+          </div>
+
+          <div className="profile-stat-card">
+            <h2>{profile?.certification || "Hobby"}</h2>
+            <span>Certification</span>
+          </div>
+
+        </div>
+
+        {nextDive && (
+          <div
+            className="next-dive-card"
+            onClick={() => router.push(`/dives/${nextDive.id}`)}
           >
-            + Create Dive
-          </button>
-        </div>
 
-        <div className="dives-grid">
-          {dives.map((dive) => (
-            <DiveCard key={dive.id} dive={dive} />
-          ))}
-        </div>
+            <h2>Upcoming Dive</h2>
+
+            <h1>{nextDive.title}</h1>
+
+            <p>📍 {nextDive.location}</p>
+
+            <span>
+              {new Date(nextDive.date).toLocaleDateString("en-GB", {
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+              })}
+            </span>
+
+          </div>
+        )}
+
       </div>
+
     </div>
   );
 }
