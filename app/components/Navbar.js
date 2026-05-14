@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [user, setUser] = useState(null);
+  const [username, setUsername] = useState("Diver");
 
   useEffect(() => {
     getUser();
@@ -19,21 +19,29 @@ export default function Navbar() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    setUser(user);
+    if (!user) return;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.username) {
+      setUsername(profile.username);
+    }
   }
 
   async function handleLogout() {
     await supabase.auth.signOut();
+
     router.push("/login");
   }
 
   return (
     <nav className="navbar">
-      <div
-        className="navbar-left"
-        onClick={() => router.push("/home")}
-        style={{ cursor: "pointer" }}
-      >
+      {/* LEFT */}
+      <div className="nav-left">
         <img
           src="/divr-logo.png"
           alt="DIVR"
@@ -41,10 +49,11 @@ export default function Navbar() {
         />
       </div>
 
-      <div className="navbar-center">
+      {/* CENTER */}
+      <div className="nav-links">
         <button
           className={`nav-link ${
-            pathname === "/home" ? "active-nav" : ""
+            pathname === "/home" ? "active" : ""
           }`}
           onClick={() => router.push("/home")}
         >
@@ -53,7 +62,7 @@ export default function Navbar() {
 
         <button
           className={`nav-link ${
-            pathname === "/dives" ? "active-nav" : ""
+            pathname === "/dives" ? "active" : ""
           }`}
           onClick={() => router.push("/dives")}
         >
@@ -62,7 +71,7 @@ export default function Navbar() {
 
         <button
           className={`nav-link ${
-            pathname === "/profile" ? "active-nav" : ""
+            pathname === "/profile" ? "active" : ""
           }`}
           onClick={() => router.push("/profile")}
         >
@@ -71,7 +80,7 @@ export default function Navbar() {
 
         <button
           className={`nav-link ${
-            pathname === "/divrdex" ? "active-nav" : ""
+            pathname === "/divrdex" ? "active" : ""
           }`}
           onClick={() => router.push("/divrdex")}
         >
@@ -79,26 +88,24 @@ export default function Navbar() {
         </button>
       </div>
 
-      <div className="navbar-right">
+      {/* RIGHT */}
+      <div className="nav-right">
         <div
           className="navbar-profile"
           onClick={() => router.push("/profile")}
         >
           <div className="navbar-avatar">
-            {user?.email?.charAt(0).toUpperCase() || "D"}
+            {username.charAt(0).toUpperCase()}
           </div>
 
           <div className="navbar-user-info">
-            <span>
-              {user?.email?.split("@")[0] || "Diver"}
-            </span>
-
+            <span>{username}</span>
             <small>View Profile</small>
           </div>
         </div>
 
         <button
-          className="logout-btn"
+          className="logout-link"
           onClick={handleLogout}
         >
           Logout
