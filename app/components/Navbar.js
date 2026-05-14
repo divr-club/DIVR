@@ -8,28 +8,18 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [username, setUsername] = useState("");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetchProfile();
+    getUser();
   }, []);
 
-  async function fetchProfile() {
+  async function getUser() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("profiles")
-      .select("username")
-      .eq("id", user.id)
-      .single();
-
-    if (data) {
-      setUsername(data.username);
-    }
+    setUser(user);
   }
 
   async function handleLogout() {
@@ -38,64 +28,82 @@ export default function Navbar() {
   }
 
   return (
-    <div className="navbar">
-      <div className="nav-left">
-        <div className="logo-circle">≋</div>
-
-        <div className="nav-brand">
-          <div className="nav-title">DIVR</div>
-          <div className="nav-subtitle">
-            EXPLORE • DIVE • CONNECT
-          </div>
-        </div>
+    <nav className="navbar">
+      <div
+        className="navbar-left"
+        onClick={() => router.push("/home")}
+        style={{ cursor: "pointer" }}
+      >
+        <img
+          src="/divr-logo.png"
+          alt="DIVR"
+          className="navbar-logo"
+        />
       </div>
 
-      <div className="nav-links">
-        <a
-          href="/home"
-          className={`nav-link${pathname === "/home" ? " active" : ""}`}
+      <div className="navbar-center">
+        <button
+          className={`nav-link ${
+            pathname === "/home" ? "active-nav" : ""
+          }`}
+          onClick={() => router.push("/home")}
         >
           Home
-        </a>
+        </button>
 
-        <a
-          href="/dives"
-          className={`nav-link${pathname === "/dives" ? " active" : ""}`}
+        <button
+          className={`nav-link ${
+            pathname === "/dives" ? "active-nav" : ""
+          }`}
+          onClick={() => router.push("/dives")}
         >
           Dives
-        </a>
-<button
-  className="nav-link"
-  onClick={() => router.push("/profile")}
->
-  Profile
-</button>
-        <a
-          href="/divrdex"
-          className={`nav-link${pathname === "/divrdex" ? " active" : ""}`}
+        </button>
+
+        <button
+          className={`nav-link ${
+            pathname === "/profile" ? "active-nav" : ""
+          }`}
+          onClick={() => router.push("/profile")}
+        >
+          Profile
+        </button>
+
+        <button
+          className={`nav-link ${
+            pathname === "/divrdex" ? "active-nav" : ""
+          }`}
+          onClick={() => router.push("/divrdex")}
         >
           Divr-dex
-        </a>
+        </button>
       </div>
 
-      <div className="nav-profile">
-        <div className="profile-avatar">
-          {username?.charAt(0)?.toUpperCase() || "D"}
-        </div>
-
-        <div className="profile-meta">
-          <div className="profile-name">
-            {username || "Diver"}
+      <div className="navbar-right">
+        <div
+          className="navbar-profile"
+          onClick={() => router.push("/profile")}
+        >
+          <div className="navbar-avatar">
+            {user?.email?.charAt(0).toUpperCase() || "D"}
           </div>
 
-          <button
-            className="logout-link"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
+          <div className="navbar-user-info">
+            <span>
+              {user?.email?.split("@")[0] || "Diver"}
+            </span>
+
+            <small>View Profile</small>
+          </div>
         </div>
+
+        <button
+          className="logout-btn"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
       </div>
-    </div>
+    </nav>
   );
 }
