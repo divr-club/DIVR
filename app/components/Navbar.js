@@ -64,7 +64,9 @@ export default function Navbar() {
         >
           Dives
         </a>
-
+<button onClick={() => router.push("/profile")}>
+  Profile
+</button>
         <a
           href="/divrdex"
           className={`nav-link${pathname === "/divrdex" ? " active" : ""}`}
