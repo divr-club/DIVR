@@ -537,3 +537,10 @@ a {
 
   font-size: 14px;
 }
+.text-logo {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: 0.35rem;
+  color: white;
+  cursor: pointer;
+}
