@@ -1220,3 +1220,65 @@ body::after {
 
   z-index: 5;
 }
+.profile-card {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 40px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.profile-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22d3ee, #0891b2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 700;
+  color: white;
+}
+
+.profile-location {
+  color: rgba(255,255,255,0.6);
+  margin-top: 6px;
+}
+
+.profile-bio {
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.profile-stat {
+  min-width: 140px;
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.profile-stat span {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: #22d3ee;
+}
+
+.profile-stat p {
+  margin-top: 8px;
+  color: rgba(255,255,255,0.6);
+}
