@@ -6,6 +6,7 @@ import { supabase } from "../../lib/supabase";
 import Navbar from "../components/Navbar";
 
 export default function DivesPage() {
+
   const router = useRouter();
 
   const [dives, setDives] = useState([]);
@@ -17,33 +18,44 @@ export default function DivesPage() {
 
   async function fetchDives() {
 
-    const { data, error } = await supabase
-      .from("dives")
-      .select(`
-        *,
-        dive_participants (
-          user_id
-        )
-      `)
-      .order("date", { ascending: true });
+    // GET DIVES
+    const { data: divesData, error: divesError } =
+      await supabase
+        .from("dives")
+        .select("*")
+        .order("date", { ascending: true });
 
-    if (error) {
-      console.error(error);
+    if (divesError) {
+      console.error(divesError);
       setLoading(false);
       return;
     }
 
-    const formatted = (data || []).map((dive) => {
+    // GET PARTICIPANTS
+    const { data: participantsData, error: participantsError } =
+      await supabase
+        .from("dive_participants")
+        .select("*");
 
-      const joinedCount =
-        dive.dive_participants?.length || 0;
+    if (participantsError) {
+      console.error(participantsError);
+    }
+
+    const formatted = (divesData || []).map((dive) => {
+
+      const participants =
+        (participantsData || []).filter(
+          (p) => p.dive_id === dive.id
+        );
 
       return {
         ...dive,
-        spots_left: Math.max(
-          (dive.spots || 0) - joinedCount,
-          0
-        ),
+        participants,
+        spots_left:
+          Math.max(
+            (dive.spots || 0) - participants.length,
+            0
+          ),
       };
     });
 
@@ -54,6 +66,7 @@ export default function DivesPage() {
 
   return (
     <div className="dives-page">
+
       <Navbar />
 
       <div className="dives-content">
@@ -72,8 +85,11 @@ export default function DivesPage() {
         </div>
 
         {loading ? (
+
           <p>Loading...</p>
+
         ) : (
+
           <div className="dives-grid">
 
             {dives.map((dive) => (
@@ -114,13 +130,13 @@ export default function DivesPage() {
                   )}
                 </div>
 
-                {dive.dive_participants?.length > 0 && (
+                {dive.participants.length > 0 && (
 
                   <div className="dive-participants-preview">
 
-                    {dive.dive_participants
+                    {dive.participants
                       .slice(0, 5)
-                      .map((_, index) => (
+                      .map((participant, index) => (
 
                         <div
                           key={index}
@@ -140,7 +156,9 @@ export default function DivesPage() {
             ))}
 
           </div>
+
         )}
+
       </div>
     </div>
   );
