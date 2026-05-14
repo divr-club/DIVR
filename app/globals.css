@@ -1215,3 +1215,8 @@ body::after {
 
   font-weight: 600;
 }
+.dive-card {
+  position: relative;
+
+  z-index: 5;
+}
