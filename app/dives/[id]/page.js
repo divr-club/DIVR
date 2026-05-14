@@ -9,9 +9,19 @@ export default function DiveDetailsPage() {
   const params = useParams();
 
   const [dive, setDive] = useState(null);
+
   const [participants, setParticipants] = useState([]);
+
+  const [species, setSpecies] = useState([]);
+
+  const [selectedSpecies, setSelectedSpecies] = useState([]);
+
   const [loading, setLoading] = useState(true);
+
   const [joining, setJoining] = useState(false);
+
+  const [savingSpecies, setSavingSpecies] = useState(false);
+
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -26,6 +36,8 @@ export default function DiveDetailsPage() {
     setUser(user);
 
     await fetchDive();
+
+    await fetchSpecies();
   }
 
   async function fetchDive() {
@@ -47,6 +59,15 @@ export default function DiveDetailsPage() {
     setLoading(false);
   }
 
+  async function fetchSpecies() {
+    const { data } = await supabase
+      .from("species")
+      .select("*")
+      .order("name");
+
+    setSpecies(data || []);
+  }
+
   async function joinDive() {
     setJoining(true);
 
@@ -64,6 +85,41 @@ export default function DiveDetailsPage() {
     setJoining(false);
   }
 
+  function toggleSpecies(speciesId) {
+    if (selectedSpecies.includes(speciesId)) {
+      setSelectedSpecies(
+        selectedSpecies.filter((id) => id !== speciesId)
+      );
+    } else {
+      setSelectedSpecies([
+        ...selectedSpecies,
+        speciesId,
+      ]);
+    }
+  }
+
+  async function saveSpecies() {
+    if (!user) return;
+
+    setSavingSpecies(true);
+
+    const inserts = selectedSpecies.map((speciesId) => ({
+      user_id: user.id,
+      species_id: speciesId,
+      dive_id: params.id,
+    }));
+
+    const { error } = await supabase
+      .from("user_species")
+      .insert(inserts);
+
+    if (!error) {
+      alert("Species logged successfully.");
+    }
+
+    setSavingSpecies(false);
+  }
+
   if (loading || !dive) {
     return (
       <div className="dives-page">
@@ -72,7 +128,8 @@ export default function DiveDetailsPage() {
     );
   }
 
-  const spotsLeft = dive.spots - participants.length;
+  const spotsLeft =
+    dive.spots - participants.length;
 
   const alreadyJoined = participants.some(
     (p) => p.user_id === user?.id
@@ -104,14 +161,17 @@ export default function DiveDetailsPage() {
           </div>
 
           <div className="dive-date">
-            {new Date(dive.date).toLocaleString("en-GB", {
-              weekday: "short",
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {new Date(dive.date).toLocaleString(
+              "en-GB",
+              {
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }
+            )}
           </div>
 
           <button
@@ -128,10 +188,56 @@ export default function DiveDetailsPage() {
 
           <div className="participants-list">
             {participants.map((p) => (
-              <div key={p.id} className="participant-chip">
+              <div
+                key={p.id}
+                className="participant-chip"
+              >
                 Diver
               </div>
             ))}
+          </div>
+
+          {/* SPECIES LOGGING */}
+
+          <div className="species-log-section">
+
+            <h2>Species Spotted</h2>
+
+            <div className="species-grid">
+
+              {species.map((item) => (
+
+                <button
+                  key={item.id}
+                  className={`species-pill ${
+                    selectedSpecies.includes(item.id)
+                      ? "selected-species"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    toggleSpecies(item.id)
+                  }
+                >
+                  {item.name}
+                </button>
+
+              ))}
+
+            </div>
+
+            <button
+              className="save-species-btn"
+              onClick={saveSpecies}
+              disabled={
+                savingSpecies ||
+                selectedSpecies.length === 0
+              }
+            >
+              {savingSpecies
+                ? "Saving..."
+                : "Log Species"}
+            </button>
+
           </div>
 
         </div>
