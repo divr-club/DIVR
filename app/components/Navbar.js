@@ -64,7 +64,10 @@ export default function Navbar() {
         >
           Dives
         </a>
-<button onClick={() => router.push("/profile")}>
+<button
+  className="nav-link"
+  onClick={() => router.push("/profile")}
+>
   Profile
 </button>
         <a
