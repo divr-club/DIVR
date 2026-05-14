@@ -6,125 +6,96 @@ import Navbar from "../components/Navbar";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProfile();
+    loadProfile();
   }, []);
 
-  async function fetchProfile() {
+  async function loadProfile() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    if (!user) return;
 
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
-      .maybeSingle();
-
-    console.log("PROFILE:", data);
-    console.log("ERROR:", error);
-
-    if (error) {
-      console.error(error);
-      setLoading(false);
-      return;
-    }
+      .single();
 
     setProfile(data);
-    setLoading(false);
-  }
-
-  if (loading) {
-    return (
-      <div className="dives-page">
-        <Navbar />
-
-        <div className="dives-content">
-          <p
-            style={{
-              color: "#22d3ee",
-              fontSize: "15px",
-              letterSpacing: "0.08em",
-            }}
-          >
-            Surfacing diver profile...
-          </p>
-        </div>
-      </div>
-    );
   }
 
   if (!profile) {
     return (
       <div className="dives-page">
         <Navbar />
-
-        <div className="dives-content">
-          <p style={{ color: "white" }}>
-            No profile found.
-          </p>
-        </div>
       </div>
     );
   }
 
   return (
     <div className="dives-page">
+
       <Navbar />
 
-      <div className="dives-content">
-        <div className="glass-card profile-card">
+      <div className="profile-wrapper">
+
+        <div className="profile-card">
+
           <div className="profile-header">
+
             <div className="profile-avatar">
               {profile.username?.charAt(0).toUpperCase()}
             </div>
 
             <div>
-              <h1>
-                {profile.username || "Unknown Diver"}
-              </h1>
 
-              <p className="profile-location">
-                {profile.home_location || "Unknown waters"}
-              </p>
+              <h1>{profile.username}</h1>
+
+              <p>{profile.home_location || "Unknown waters"}</p>
+
             </div>
+
           </div>
 
           <p className="profile-bio">
             {profile.bio || "No bio added yet."}
           </p>
 
-          <div className="profile-stats">
-            <div className="profile-stat">
-              <span>
-                {profile.dives_completed || 0}
-              </span>
-              <p>Dives</p>
+          <div className="profile-details">
+
+            <div className="profile-stat-card">
+              <h2>{profile.total_logged_dives || 0}</h2>
+              <span>Dives</span>
             </div>
 
-            <div className="profile-stat">
-              <span>
-                {profile.species_unlocked || 0}
-              </span>
-              <p>Species</p>
+            <div className="profile-stat-card">
+              <h2>{profile.species_count || 0}</h2>
+              <span>Species</span>
             </div>
 
-            <div className="profile-stat">
-              <span>
-                {profile.certifications?.length || 0}
-              </span>
-              <p>Certifications</p>
+            <div className="profile-stat-card">
+              <h2>{profile.certification || "Hobby"}</h2>
+              <span>Certification</span>
             </div>
+
           </div>
+
+          <div className="profile-extra">
+
+            <p>
+              <strong>WhatsApp:</strong>{" "}
+              {profile.whatsapp || "Not added"}
+            </p>
+
+          </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }
