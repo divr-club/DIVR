@@ -197,7 +197,7 @@ export default function DiveDetailsPage() {
                 key={p.id}
                 className="participant-chip"
               >
-                Diver
+                {p.profiles?.username || "Diver"}
               </div>
             ))}
           </div>
