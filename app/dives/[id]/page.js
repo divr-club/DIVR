@@ -43,7 +43,12 @@ export default function DiveDetailsPage() {
   async function fetchDive() {
     const { data } = await supabase
       .from("dives")
-      .select("*")
+      .select(`
+  *,
+  profiles (
+    username
+  )
+`)
       .eq("id", params.id)
       .single();
 
