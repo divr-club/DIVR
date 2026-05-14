@@ -41,12 +41,11 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       {/* LEFT */}
-      <div className="nav-left">
-        <img
-          src="/divr-logo.png"
-          alt="DIVR"
-          className="navbar-logo"
-        />
+     <div className="nav-left">
+  <div className="text-logo">
+    DIVR
+  </div>
+</div>
       </div>
 
       {/* CENTER */}
