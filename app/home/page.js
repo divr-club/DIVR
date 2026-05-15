@@ -50,7 +50,7 @@ export default function HomePage() {
         <div className="home-hero">
 
           <h1>
-            Welcome back, {profile?.username || "Diver"} 🌊
+            Welcome back, {profile?.username ?? "Diver"} 🌊
           </h1>
 
           <p className="home-subtext">
