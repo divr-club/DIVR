@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadProfile();
@@ -16,23 +17,22 @@ export default function ProfilePage() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
       .maybeSingle();
 
-    setProfile(data);
-  }
+    console.log("PROFILE:", data);
+    console.log("ERROR:", error);
 
-  if (!profile) {
-    return (
-      <div className="dives-page">
-        <Navbar />
-      </div>
-    );
+    setProfile(data);
+    setLoading(false);
   }
 
   return (
@@ -42,57 +42,71 @@ export default function ProfilePage() {
 
       <div className="profile-wrapper">
 
-        <div className="profile-card">
+        {loading ? (
+          <h2 style={{ color: "white" }}>
+            Loading profile...
+          </h2>
+        ) : !profile ? (
+          <h2 style={{ color: "white" }}>
+            No profile found.
+          </h2>
+        ) : (
+          <div className="profile-card">
 
-          <div className="profile-header">
+            <div className="profile-header">
 
-            <div className="profile-avatar">
-              {profile.username?.charAt(0).toUpperCase()}
+              <div className="profile-avatar">
+                {profile.username?.charAt(0).toUpperCase() || "D"}
+              </div>
+
+              <div>
+
+                <h1>
+                  {profile.username || "Diver"}
+                </h1>
+
+                <p>
+                  {profile.home_location || "Unknown waters"}
+                </p>
+
+              </div>
+
             </div>
 
-            <div>
-
-              <h1>{profile.username}</h1>
-
-              <p>{profile.home_location || "Unknown waters"}</p>
-
-            </div>
-
-          </div>
-
-          <p className="profile-bio">
-            {profile.bio || "No bio added yet."}
-          </p>
-
-          <div className="profile-details">
-
-            <div className="profile-stat-card">
-              <h2>{profile.total_logged_dives || 0}</h2>
-              <span>Dives</span>
-            </div>
-
-            <div className="profile-stat-card">
-              <h2>{profile.species_count || 0}</h2>
-              <span>Species</span>
-            </div>
-
-            <div className="profile-stat-card">
-              <h2>{profile.certification || "Hobby"}</h2>
-              <span>Certification</span>
-            </div>
-
-          </div>
-
-          <div className="profile-extra">
-
-            <p>
-              <strong>WhatsApp:</strong>{" "}
-              {profile.whatsapp || "Not added"}
+            <p className="profile-bio">
+              {profile.bio || "No bio added yet."}
             </p>
 
-          </div>
+            <div className="profile-details">
 
-        </div>
+              <div className="profile-stat-card">
+                <h2>{profile.total_logged_dives || 0}</h2>
+                <span>Total Dives</span>
+              </div>
+
+              <div className="profile-stat-card">
+                <h2>{profile.species_count || 0}</h2>
+                <span>Species Found</span>
+              </div>
+
+              <div className="profile-stat-card">
+                <h2>{profile.certification || "Hobby"}</h2>
+                <span>Certification</span>
+              </div>
+
+            </div>
+
+            <div className="profile-extra">
+
+              <p>
+                <strong>WhatsApp:</strong>{" "}
+                {profile.whatsapp || "Not added"}
+              </p>
+
+            </div>
+
+          </div>
+        )}
 
       </div>
 
