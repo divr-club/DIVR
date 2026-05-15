@@ -33,18 +33,31 @@ export default function SignupPage() {
       return;
     }
 
+    console.log("AUTH USER:", data.user);
+
     if (data.user) {
-      await supabase.from("profiles").insert({
-        id: data.user.id,
-        username,
-        certification,
-        home_location: location,
-        whatsapp,
-        bio: "",
-        dives_count: 0,
-        species_count: 0,
-        total_logged_dives: 0,
-      });
+
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: data.user.id,
+          username: username,
+          certification: certification,
+          home_location: location,
+          whatsapp: whatsapp,
+          bio: "",
+          dives_count: 0,
+          species_count: 0,
+          total_logged_dives: 0,
+        });
+
+      console.log("PROFILE INSERT ERROR:", profileError);
+
+      if (profileError) {
+        alert(profileError.message);
+        setLoading(false);
+        return;
+      }
     }
 
     alert("Account created 🌊");
