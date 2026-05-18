@@ -9,20 +9,13 @@ export default function DiveDetailsPage() {
   const params = useParams();
 
   const [dive, setDive] = useState(null);
-
   const [participants, setParticipants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [joining, setJoining] = useState(false);
+  const [user, setUser] = useState(null);
 
   const [species, setSpecies] = useState([]);
-
-  const [selectedSpecies, setSelectedSpecies] = useState([]);
-
-  const [loading, setLoading] = useState(true);
-
-  const [joining, setJoining] = useState(false);
-
-  const [savingSpecies, setSavingSpecies] = useState(false);
-
-  const [user, setUser] = useState(null);
+  const [selectedSpecies, setSelectedSpecies] = useState("");
 
   useEffect(() => {
     loadPage();
@@ -37,18 +30,17 @@ export default function DiveDetailsPage() {
 
     await fetchDive();
 
-    await fetchSpecies();
+    const { data: speciesData } = await supabase
+      .from("species")
+      .select("*");
+
+    setSpecies(speciesData || []);
   }
 
   async function fetchDive() {
     const { data } = await supabase
       .from("dives")
-      .select(`
-  *,
-  profiles (
-    username
-  )
-`)
+      .select("*")
       .eq("id", params.id)
       .single();
 
@@ -56,21 +48,17 @@ export default function DiveDetailsPage() {
 
     const { data: participantData } = await supabase
       .from("dive_participants")
-      .select("*")
+      .select(`
+        *,
+        profiles (
+          username
+        )
+      `)
       .eq("dive_id", params.id);
 
     setParticipants(participantData || []);
 
     setLoading(false);
-  }
-
-  async function fetchSpecies() {
-    const { data } = await supabase
-      .from("species")
-      .select("*")
-      .order("name");
-
-    setSpecies(data || []);
   }
 
   async function joinDive() {
@@ -84,45 +72,60 @@ export default function DiveDetailsPage() {
       });
 
     if (!error) {
+      const currentProfile = await supabase
+        .from("profiles")
+        .select("dives_count")
+        .eq("id", user.id)
+        .single();
+
+      const currentCount =
+        currentProfile.data?.dives_count || 0;
+
+      await supabase
+        .from("profiles")
+        .update({
+          dives_count: currentCount + 1,
+        })
+        .eq("id", user.id);
+
       await fetchDive();
     }
 
     setJoining(false);
   }
 
-  function toggleSpecies(speciesId) {
-    if (selectedSpecies.includes(speciesId)) {
-      setSelectedSpecies(
-        selectedSpecies.filter((id) => id !== speciesId)
-      );
-    } else {
-      setSelectedSpecies([
-        ...selectedSpecies,
-        speciesId,
-      ]);
-    }
-  }
-
-  async function saveSpecies() {
-    if (!user) return;
-
-    setSavingSpecies(true);
-
-    const inserts = selectedSpecies.map((speciesId) => ({
-      user_id: user.id,
-      species_id: speciesId,
-      dive_id: params.id,
-    }));
+  async function logSpecies() {
+    if (!selectedSpecies) return;
 
     const { error } = await supabase
       .from("user_species")
-      .insert(inserts);
+      .insert({
+        user_id: user.id,
+        species_id: selectedSpecies,
+      });
 
-    if (!error) {
-      alert("Species logged successfully.");
+    if (error) {
+      alert(error.message);
+      return;
     }
 
-    setSavingSpecies(false);
+    const currentProfile = await supabase
+      .from("profiles")
+      .select("species_count")
+      .eq("id", user.id)
+      .single();
+
+    const currentCount =
+      currentProfile.data?.species_count || 0;
+
+    await supabase
+      .from("profiles")
+      .update({
+        species_count: currentCount + 1,
+      })
+      .eq("id", user.id);
+
+    alert("Species logged 🐠");
   }
 
   if (loading || !dive) {
@@ -133,8 +136,7 @@ export default function DiveDetailsPage() {
     );
   }
 
-  const spotsLeft =
-    dive.spots - participants.length;
+  const spotsLeft = dive.spots - participants.length;
 
   const alreadyJoined = participants.some(
     (p) => p.user_id === user?.id
@@ -166,17 +168,14 @@ export default function DiveDetailsPage() {
           </div>
 
           <div className="dive-date">
-            {new Date(dive.date).toLocaleString(
-              "en-GB",
-              {
-                weekday: "short",
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              }
-            )}
+            {new Date(dive.date).toLocaleString("en-GB", {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </div>
 
           <button
@@ -191,6 +190,40 @@ export default function DiveDetailsPage() {
               : "Join Dive"}
           </button>
 
+          <div className="species-logger">
+
+            <h3>Log Species</h3>
+
+            <select
+              value={selectedSpecies}
+              onChange={(e) =>
+                setSelectedSpecies(e.target.value)
+              }
+              className="species-select"
+            >
+              <option value="">
+                Select species
+              </option>
+
+              {species.map((fish) => (
+                <option
+                  key={fish.id}
+                  value={fish.id}
+                >
+                  {fish.name}
+                </option>
+              ))}
+            </select>
+
+            <button
+              className="join-dive-btn"
+              onClick={logSpecies}
+            >
+              Log Species
+            </button>
+
+          </div>
+
           <div className="participants-list">
             {participants.map((p) => (
               <div
@@ -200,49 +233,6 @@ export default function DiveDetailsPage() {
                 {p.profiles?.username || "Diver"}
               </div>
             ))}
-          </div>
-
-          {/* SPECIES LOGGING */}
-
-          <div className="species-log-section">
-
-            <h2>Species Spotted</h2>
-
-            <div className="species-grid">
-
-              {species.map((item) => (
-
-                <button
-                  key={item.id}
-                  className={`species-pill ${
-                    selectedSpecies.includes(item.id)
-                      ? "selected-species"
-                      : ""
-                  }`}
-                  onClick={() =>
-                    toggleSpecies(item.id)
-                  }
-                >
-                  {item.name}
-                </button>
-
-              ))}
-
-            </div>
-
-            <button
-              className="save-species-btn"
-              onClick={saveSpecies}
-              disabled={
-                savingSpecies ||
-                selectedSpecies.length === 0
-              }
-            >
-              {savingSpecies
-                ? "Saving..."
-                : "Log Species"}
-            </button>
-
           </div>
 
         </div>
