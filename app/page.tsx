@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import Navbar from "./components/Navbar";
-import Link from "next/link";
 
 export default function HomePage() {
+  const router = useRouter();
+
   const [profile, setProfile] = useState<any>(null);
-  const [upcomingDive, setUpcomingDive] = useState<any>(null);
-  const [speciesCount, setSpeciesCount] = useState(0);
-  const [loggedDiveCount, setLoggedDiveCount] = useState(0);
+  const [latestDive, setLatestDive] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadHome();
@@ -20,7 +21,10 @@ export default function HomePage() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) return;
+    if (!user) {
+      router.push("/login");
+      return;
+    }
 
     // PROFILE
     const { data: profileData } = await supabase
@@ -31,32 +35,28 @@ export default function HomePage() {
 
     setProfile(profileData);
 
-    // UPCOMING DIVE
-    const { data: upcomingDiveData } = await supabase
+    // LATEST UPCOMING DIVE
+    const today = new Date().toISOString();
+
+    const { data: diveData } = await supabase
       .from("dives")
       .select("*")
-      .gte("date", new Date().toISOString())
+      .gte("date", today)
       .order("date", { ascending: true })
       .limit(1)
       .single();
 
-    setUpcomingDive(upcomingDiveData);
+    setLatestDive(diveData);
 
-    // SPECIES COUNT
-    const { count: speciesFound } = await supabase
-      .from("user_species")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
+    setLoading(false);
+  }
 
-    setSpeciesCount(speciesFound || 0);
-
-    // LOGGED DIVES COUNT
-    const { count: loggedDives } = await supabase
-      .from("logged_dives")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
-
-    setLoggedDiveCount(loggedDives || 0);
+  if (loading) {
+    return (
+      <div className="home-page">
+        <Navbar />
+      </div>
+    );
   }
 
   return (
@@ -80,19 +80,17 @@ export default function HomePage() {
         <div className="home-stats-grid">
 
           <div className="home-stat-card">
-            <h2>{loggedDiveCount}</h2>
+            <h2>{profile?.dives_logged || 0}</h2>
             <p>Total Dives</p>
           </div>
 
           <div className="home-stat-card">
-            <h2>{speciesCount}</h2>
+            <h2>{profile?.species_count || 0}</h2>
             <p>Species Found</p>
           </div>
 
           <div className="home-stat-card">
-            <h2>
-              {profile?.certification || "Hobby"}
-            </h2>
+            <h2>{profile?.certification || "Hobby"}</h2>
             <p>Certification</p>
           </div>
 
@@ -104,60 +102,67 @@ export default function HomePage() {
           <div className="section-header">
             <h2>Upcoming Dive</h2>
 
-            <Link href="/dives">
-              <button className="view-all-btn">
-                View All
-              </button>
-            </Link>
+            <button
+              className="view-all-btn"
+              onClick={() => router.push("/dives")}
+            >
+              View All
+            </button>
           </div>
 
-          {upcomingDive ? (
-            <Link href={`/dives/${upcomingDive.id}`}>
+          {latestDive ? (
+            <div
+              className="upcoming-dive-card"
+              onClick={() => router.push(`/dives/${latestDive.id}`)}
+            >
 
-              <div className="upcoming-dive-card">
+              <div className="upcoming-dive-top">
 
-                <div className="upcoming-dive-top">
-                  <span className="dive-type-badge">
-                    {upcomingDive.type || "Reef"}
-                  </span>
-                </div>
+                <span className="dive-type-badge">
+                  {latestDive.type || "Reef"}
+                </span>
 
-                <h3>{upcomingDive.title}</h3>
-
-                <p className="dive-location">
-                  📍 {upcomingDive.location}
-                </p>
-
-                <p className="dive-date">
-                  {new Date(upcomingDive.date).toLocaleString(
-                    "en-GB",
-                    {
-                      weekday: "short",
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }
-                  )}
-                </p>
+                <span>
+                  {latestDive.spots} spots
+                </span>
 
               </div>
 
-            </Link>
+              <h3>{latestDive.title}</h3>
+
+              <div className="dive-location">
+                📍 {latestDive.location}
+              </div>
+
+              <div className="dive-date">
+                {new Date(latestDive.date).toLocaleString("en-GB", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </div>
+
+            </div>
           ) : (
             <div className="empty-home-card">
-              <p>No upcoming dives yet.</p>
 
-              <Link href="/dives">
-                <button className="create-dive-btn">
-                  Explore Dives
-                </button>
-              </Link>
+              <p>
+                No upcoming dives yet.
+              </p>
+
+              <button
+                className="create-dive-btn"
+                onClick={() => router.push("/dives")}
+              >
+                Create a Dive
+              </button>
+
             </div>
           )}
 
         </div>
-
       </div>
     </div>
   );
