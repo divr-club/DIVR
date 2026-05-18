@@ -1,18 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { supabase } from "../lib/supabase";
 import Navbar from "./components/Navbar";
+import Link from "next/link";
 
 export default function HomePage() {
   const [profile, setProfile] = useState<any>(null);
-  const [latestDive, setLatestDive] = useState<any>(null);
-
-  const [totalDives, setTotalDives] = useState(0);
+  const [upcomingDive, setUpcomingDive] = useState<any>(null);
   const [speciesCount, setSpeciesCount] = useState(0);
-
-  const [loading, setLoading] = useState(true);
+  const [loggedDiveCount, setLoggedDiveCount] = useState(0);
 
   useEffect(() => {
     loadHome();
@@ -34,58 +31,42 @@ export default function HomePage() {
 
     setProfile(profileData);
 
-    // TOTAL LOGGED DIVES
-    const { count: divesCount } = await supabase
-      .from("logged_dives")
-      .select("*", {
-        count: "exact",
-        head: true,
-      })
-      .eq("user_id", user.id);
+    // UPCOMING DIVE
+    const { data: upcomingDiveData } = await supabase
+      .from("dives")
+      .select("*")
+      .gte("date", new Date().toISOString())
+      .order("date", { ascending: true })
+      .limit(1)
+      .single();
 
-    setTotalDives(divesCount || 0);
+    setUpcomingDive(upcomingDiveData);
 
-    // TOTAL SPECIES
+    // SPECIES COUNT
     const { count: speciesFound } = await supabase
       .from("user_species")
-      .select("*", {
-        count: "exact",
-        head: true,
-      })
+      .select("*", { count: "exact", head: true })
       .eq("user_id", user.id);
 
     setSpeciesCount(speciesFound || 0);
 
-    // MOST RECENT DIVE
-    const { data: latestDiveData } = await supabase
+    // LOGGED DIVES COUNT
+    const { count: loggedDives } = await supabase
       .from("logged_dives")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("date", { ascending: false })
-      .limit(1)
-      .single();
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id);
 
-    setLatestDive(latestDiveData);
-
-    setLoading(false);
-  }
-
-  if (loading) {
-    return (
-      <div className="dives-page">
-        <Navbar />
-      </div>
-    );
+    setLoggedDiveCount(loggedDives || 0);
   }
 
   return (
-    <div className="dives-page">
+    <div className="home-page">
       <Navbar />
 
       <div className="home-wrapper">
 
-        <div className="hero-section">
-
+        {/* HERO */}
+        <div className="home-hero">
           <h1>
             Welcome back, {profile?.username || "Diver"} 🌊
           </h1>
@@ -93,28 +74,22 @@ export default function HomePage() {
           <p>
             Keep diving. The reef remembers who returns.
           </p>
-
-          <Link href="/log-dive">
-            <button className="create-dive-btn">
-              + Log Dive
-            </button>
-          </Link>
-
         </div>
 
-        <div className="stats-grid">
+        {/* STATS */}
+        <div className="home-stats-grid">
 
-          <div className="stat-card">
-            <h2>{totalDives}</h2>
-            <p>Total Logged Dives</p>
+          <div className="home-stat-card">
+            <h2>{loggedDiveCount}</h2>
+            <p>Total Dives</p>
           </div>
 
-          <div className="stat-card">
+          <div className="home-stat-card">
             <h2>{speciesCount}</h2>
             <p>Species Found</p>
           </div>
 
-          <div className="stat-card">
+          <div className="home-stat-card">
             <h2>
               {profile?.certification || "Hobby"}
             </h2>
@@ -123,44 +98,62 @@ export default function HomePage() {
 
         </div>
 
-        <div className="recent-dive-section">
+        {/* UPCOMING DIVE */}
+        <div className="home-section">
 
-          <h2>Most Recent Dive</h2>
+          <div className="section-header">
+            <h2>Upcoming Dive</h2>
 
-          {latestDive ? (
+            <Link href="/dives">
+              <button className="view-all-btn">
+                View All
+              </button>
+            </Link>
+          </div>
 
-            <div className="dive-card">
+          {upcomingDive ? (
+            <Link href={`/dives/${upcomingDive.id}`}>
 
-              <h3>{latestDive.title}</h3>
+              <div className="upcoming-dive-card">
 
-              <p>
-                📍 {latestDive.location}
-              </p>
+                <div className="upcoming-dive-top">
+                  <span className="dive-type-badge">
+                    {upcomingDive.type || "Reef"}
+                  </span>
+                </div>
 
-              <p>
-                {new Date(latestDive.date).toLocaleDateString(
-                  "en-GB",
-                  {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  }
-                )}
-              </p>
+                <h3>{upcomingDive.title}</h3>
 
-              {latestDive.notes && (
-                <p>{latestDive.notes}</p>
-              )}
+                <p className="dive-location">
+                  📍 {upcomingDive.location}
+                </p>
 
-            </div>
+                <p className="dive-date">
+                  {new Date(upcomingDive.date).toLocaleString(
+                    "en-GB",
+                    {
+                      weekday: "short",
+                      day: "numeric",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}
+                </p>
 
+              </div>
+
+            </Link>
           ) : (
+            <div className="empty-home-card">
+              <p>No upcoming dives yet.</p>
 
-            <div className="empty-state">
-              No dives logged yet.
+              <Link href="/dives">
+                <button className="create-dive-btn">
+                  Explore Dives
+                </button>
+              </Link>
             </div>
-
           )}
 
         </div>
