@@ -143,100 +143,146 @@ export default function DiveDetailsPage() {
   );
 
   return (
-    <div className="dives-page">
-      <Navbar />
+  <div className="dive-detail-page">
 
-      <div className="dive-details-wrapper">
-        <div className="dive-details-card">
+    <Navbar />
 
-          <div className="dive-top-row">
+    <div className="dive-detail-container">
 
-            <span className="dive-type-badge">
-              {dive.type || "Reef"}
-            </span>
+      {/* MAIN DIVE CARD */}
+      <div className="dive-detail-card">
 
-            <span className="dive-spots">
-              {spotsLeft} spots left
-            </span>
+        <div className="dive-detail-top">
 
-          </div>
+          <span className="dive-type-badge">
+            {dive.type || "Reef"}
+          </span>
 
-          <h1>{dive.title}</h1>
+          <span className="spots-left">
+            {spotsLeft} spots left
+          </span>
 
-          <div className="dive-location">
-            📍 {dive.location}
-          </div>
+        </div>
 
-          <div className="dive-date">
-            {new Date(dive.date).toLocaleString("en-GB", {
-              weekday: "short",
+        <h1>{dive.title}</h1>
+
+        <div className="dive-meta">
+          📍 {dive.location}
+        </div>
+
+        <div className="dive-meta">
+          📅 {new Date(dive.date).toLocaleString(
+            "en-GB",
+            {
+              weekday: "long",
               day: "numeric",
-              month: "short",
+              month: "long",
               year: "numeric",
               hour: "2-digit",
               minute: "2-digit",
-            })}
-          </div>
+            }
+          )}
+        </div>
 
-          <button
-            className="join-dive-btn"
-            onClick={joinDive}
-            disabled={joining || alreadyJoined}
+        <button
+          className="join-dive-btn"
+          onClick={joinDive}
+          disabled={joining || alreadyJoined}
+        >
+          {alreadyJoined
+            ? "Joined ✓"
+            : joining
+            ? "Joining..."
+            : "Join Dive"}
+        </button>
+
+      </div>
+
+      {/* SPECIES LOGGER */}
+      <div className="dive-sub-card">
+
+        <h2>Log Species</h2>
+
+        <div className="species-logger">
+
+          <select
+            value={selectedSpecies}
+            onChange={(e) =>
+              setSelectedSpecies(e.target.value)
+            }
+            className="species-select"
           >
-            {alreadyJoined
-              ? "Joined ✓"
-              : joining
-              ? "Joining..."
-              : "Join Dive"}
-          </button>
 
-          <div className="species-logger">
+            <option value="">
+              Select species
+            </option>
 
-            <h3>Log Species</h3>
+            {species.map((fish) => (
 
-            <select
-              value={selectedSpecies}
-              onChange={(e) =>
-                setSelectedSpecies(e.target.value)
-              }
-              className="species-select"
-            >
-              <option value="">
-                Select species
+              <option
+                key={fish.id}
+                value={fish.id}
+              >
+                {fish.name}
               </option>
 
-              {species.map((fish) => (
-                <option
-                  key={fish.id}
-                  value={fish.id}
-                >
-                  {fish.name}
-                </option>
-              ))}
-            </select>
-
-            <button
-              className="join-dive-btn"
-              onClick={logSpecies}
-            >
-              Log Species
-            </button>
-
-          </div>
-
-          <div className="participants-list">
-            {participants.map((p) => (
-              <div
-                key={p.id}
-                className="participant-chip"
-              >
-                {p.profiles?.username || "Diver"}
-              </div>
             ))}
-          </div>
+
+          </select>
+
+          <button
+            className="save-species-btn"
+            onClick={logSpecies}
+          >
+            Log Species
+          </button>
 
         </div>
+
       </div>
+
+      {/* PARTICIPANTS */}
+      <div className="dive-sub-card">
+
+        <h2>Divers Joining</h2>
+
+        {participants.length === 0 ? (
+
+          <p className="empty-participants">
+            No divers joined yet.
+          </p>
+
+        ) : (
+
+          <div className="participants-grid">
+
+            {participants.map((p) => (
+
+              <div
+                key={p.id}
+                className="participant-card"
+              >
+
+                <div className="participant-avatar">
+                  {p.profiles?.username?.charAt(0)?.toUpperCase() || "D"}
+                </div>
+
+                <span>
+                  {p.profiles?.username || "Diver"}
+                </span>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        )}
+
+      </div>
+
     </div>
-  );
+
+  </div>
+);
 }
