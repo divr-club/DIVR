@@ -6,7 +6,6 @@ import { supabase } from "../../lib/supabase";
 import Navbar from "../components/Navbar";
 
 export default function DivesPage() {
-
   const router = useRouter();
 
   const [dives, setDives] = useState([]);
@@ -17,8 +16,6 @@ export default function DivesPage() {
   }, []);
 
   async function fetchDives() {
-
-    // GET DIVES
     const { data: divesData, error: divesError } =
       await supabase
         .from("dives")
@@ -31,18 +28,12 @@ export default function DivesPage() {
       return;
     }
 
-    // GET PARTICIPANTS
-    const { data: participantsData, error: participantsError } =
+    const { data: participantsData } =
       await supabase
         .from("dive_participants")
         .select("*");
 
-    if (participantsError) {
-      console.error(participantsError);
-    }
-
     const formatted = (divesData || []).map((dive) => {
-
       const participants =
         (participantsData || []).filter(
           (p) => p.dive_id === dive.id
@@ -51,16 +42,14 @@ export default function DivesPage() {
       return {
         ...dive,
         participants,
-        spots_left:
-          Math.max(
-            (dive.spots || 0) - participants.length,
-            0
-          ),
+        spots_left: Math.max(
+          (dive.spots || 0) - participants.length,
+          0
+        ),
       };
     });
 
     setDives(formatted);
-
     setLoading(false);
   }
 
@@ -69,11 +58,16 @@ export default function DivesPage() {
 
       <Navbar />
 
-      <div className="dives-content">
+      <div className="dives-container">
 
         <div className="dives-header">
 
-          <h1>Upcoming Dives</h1>
+          <div>
+            <h1>Upcoming Dives</h1>
+            <p>
+              Explore the reef with other divers.
+            </p>
+          </div>
 
           <button
             className="create-dive-btn"
@@ -86,7 +80,28 @@ export default function DivesPage() {
 
         {loading ? (
 
-          <p>Loading...</p>
+          <div className="loading-text">
+            Loading dives...
+          </div>
+
+        ) : dives.length === 0 ? (
+
+          <div className="empty-dives-card">
+
+            <h2>No dives yet</h2>
+
+            <p>
+              Create your first dive and start exploring.
+            </p>
+
+            <button
+              className="create-dive-btn"
+              onClick={() => router.push("/create-dive")}
+            >
+              Create Dive
+            </button>
+
+          </div>
 
         ) : (
 
@@ -96,17 +111,17 @@ export default function DivesPage() {
 
               <div
                 key={dive.id}
-                className="dive-card"
+                className="modern-dive-card"
                 onClick={() => router.push(`/dives/${dive.id}`)}
               >
 
-                <div className="dive-card-top">
+                <div className="modern-dive-top">
 
                   <span className="dive-type-badge">
                     {dive.type || "Reef"}
                   </span>
 
-                  <span className="dive-spots">
+                  <span className="spots-left">
                     {dive.spots_left} spots left
                   </span>
 
@@ -114,11 +129,11 @@ export default function DivesPage() {
 
                 <h2>{dive.title}</h2>
 
-                <div className="dive-location">
+                <div className="modern-dive-location">
                   📍 {dive.location}
                 </div>
 
-                <div className="dive-date">
+                <div className="modern-dive-date">
                   {new Date(dive.date).toLocaleDateString(
                     "en-GB",
                     {
@@ -130,26 +145,22 @@ export default function DivesPage() {
                   )}
                 </div>
 
-                {dive.participants.length > 0 && (
+                <div className="participants-row">
 
-                  <div className="dive-participants-preview">
+                  {dive.participants
+                    .slice(0, 5)
+                    .map((participant, index) => (
 
-                    {dive.participants
-                      .slice(0, 5)
-                      .map((participant, index) => (
+                      <div
+                        key={index}
+                        className="participant-pill"
+                      >
+                        Diver
+                      </div>
 
-                        <div
-                          key={index}
-                          className="participant-bubble"
-                        >
-                          Diver
-                        </div>
+                  ))}
 
-                    ))}
-
-                  </div>
-
-                )}
+                </div>
 
               </div>
 
@@ -160,6 +171,7 @@ export default function DivesPage() {
         )}
 
       </div>
+
     </div>
   );
 }
