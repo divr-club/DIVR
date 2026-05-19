@@ -19,9 +19,9 @@ export default function DivesPage() {
     const { data: divesData, error: divesError } =
       await supabase
         .from("dives")
-        .select("*")
-        .order("date", { ascending: true });
-
+.select("*")
+.gte("date", new Date().toISOString())
+.order("date", { ascending: true });
     if (divesError) {
       console.error(divesError);
       setLoading(false);
