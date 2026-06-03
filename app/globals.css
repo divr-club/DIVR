@@ -1474,3 +1474,40 @@ a {
   }
 
 }
+/* FORCE DIVE DETAIL OVERRIDES */
+
+.dive-detail-card {
+  background: rgba(10,18,40,0.92) !important;
+  border-radius: 32px !important;
+  padding: 36px !important;
+  margin-bottom: 28px !important;
+}
+
+.dive-sub-card {
+  background: rgba(10,18,40,0.92) !important;
+  border-radius: 32px !important;
+  padding: 36px !important;
+  margin-bottom: 28px !important;
+}
+
+.dive-detail-card h1 {
+  font-size: 56px !important;
+  color: white !important;
+}
+
+.participant-card {
+  background: rgba(255,255,255,0.04) !important;
+  border-radius: 20px !important;
+  padding: 18px !important;
+}
+
+.participant-avatar {
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(
+    135deg,
+    #22d3ee,
+    #0ea5e9
+  ) !important;
+}
